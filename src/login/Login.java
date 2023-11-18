@@ -4,14 +4,47 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
+//import com.twilio.Twilio;
+//import com.twilio.rest.api.v2010.account.Message;
+//import com.twilio.type.PhoneNumber;
 
 //author codingWithShande
 public class Login extends javax.swing.JFrame {
 
-  
+    private static final String URL = "jdbc:mysql://localhost:3306/java_user_database";
+    private static final String USUARIO = "codingWithShande";
+    private static final String CONTRASENIA = "admin";
+    private static final String TWILIO_SID = "AC3c33570b0165353ea0758862f3accdb8";
+    private static final String TWILIO_AUTH_TOKEN = "65bb153f07e1d6f8cae52a1d16aa5005";
+    private static final String TWILIO_PHONE_NUMBER = "+1 814 209 4813";
+
+
+    private static String generarCodigoAleatorio() {
+        // Lógica para generar un código aleatorio, por ejemplo, de 6 dígitos
+        Random random = new Random();
+        int codigo = 100000 + random.nextInt(900000);
+        return String.valueOf(codigo);
+    }
+//    private static void enviarCodigoPorSMS(String numeroTelefono, String codigo) {
+//        try {
+//            Twilio.init(TWILIO_SID, TWILIO_AUTH_TOKEN);
+//
+//            Message message = Message.creator(
+//                            new PhoneNumber(numeroTelefono),  // Número de teléfono destino
+//                            new PhoneNumber(TWILIO_PHONE_NUMBER),  // Número de teléfono de Twilio
+//                            "Tu código de verificación es: " + codigo)
+//                    .create();
+//
+//            System.out.println("Mensaje SID: " + message.getSid());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.out.println("Error al enviar SMS: " + e.getMessage());
+//        }
+//    }
     public Login() {
         initComponents();
     }
@@ -201,43 +234,43 @@ public class Login extends javax.swing.JFrame {
 
     private void jbIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbIngresarActionPerformed
         // System.out.println("Sign up btn clicked");
-        String Email, Password, query, fname = null, passDb = null;
-        String SUrl, SUser, SPass;
+        String Email, Contrasenia, consulta, nombreCompletoDB = null, contraseniaDB = null;
+        String SUrl, SUsuario, SContrasenia;
         SUrl = "jdbc:mysql://localhost:3306/java_user_database";
-        SUser = "codingWithShande";
-        SPass = "admin";
+        SUsuario = "codingWithShande";
+        SContrasenia = "admin";
         int notFound = 0;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(SUrl, SUser, SPass);
+            Connection con = DriverManager.getConnection(SUrl, SUsuario, SContrasenia);
             Statement st = con.createStatement();
             if("".equals(jtCorreo.getText())){
-                JOptionPane.showMessageDialog(new JFrame(), "Email Address is require", "Error",
+                JOptionPane.showMessageDialog(new JFrame(), "La dirección de correo electrónico es obligatoria", "Error",
                         JOptionPane.ERROR_MESSAGE);
             }else if("".equals(contrasenia.getText())){
-                JOptionPane.showMessageDialog(new JFrame(), "Password is require", "Error",
+                JOptionPane.showMessageDialog(new JFrame(), "Se requiere contraseña", "Error",
                         JOptionPane.ERROR_MESSAGE);
             }else {
             Email    = jtCorreo.getText();
-            Password = contrasenia.getText();
-            
-            query = "SELECT * FROM user WHERE email= '"+Email+"'";
+            Contrasenia = contrasenia.getText();
+
+            consulta = "SELECT * FROM user WHERE email= '"+Email+"'";
        
-            ResultSet rs = st.executeQuery(query);
+            ResultSet rs = st.executeQuery(consulta);
             while(rs.next()){
-                passDb = rs.getString("password");
-                fname = rs.getString("full_name");
+                contraseniaDB = rs.getString("password");
+                nombreCompletoDB = rs.getString("full_name");
                 notFound = 1;
             }
-            if(notFound == 1 && Password.equals(passDb)){
+            if(notFound == 1 && Contrasenia.equals(contraseniaDB)){
                 Back HomeFrame = new Back();
-                HomeFrame.setUser(fname);
+                HomeFrame.setUser(nombreCompletoDB);
                 HomeFrame.setVisible(true);
                 HomeFrame.pack();
                 HomeFrame.setLocationRelativeTo(null); 
                 this.dispose();
             }else{
-               JOptionPane.showMessageDialog(new JFrame(), "Incorrect email or password", "Error",
+               JOptionPane.showMessageDialog(new JFrame(), "Correo o contraseña incorrectos", "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
             contrasenia.setText("");
